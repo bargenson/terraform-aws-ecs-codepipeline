@@ -205,7 +205,7 @@ resource "aws_codepipeline" "source_build_deploy" {
       name             = "Source"
       category         = "Source"
       owner            = "AWS"
-      provider         = "AWS CodeCommit"
+      provider         = "CodeCommit"
       version          = "1"
       output_artifacts = ["code"]
 
