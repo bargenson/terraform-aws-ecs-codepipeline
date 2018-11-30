@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "default" {
       "rds:*",
       "sqs:*",
       "ecs:*",
-      "iam:PassRole",
+      "iam:PassRole"
     ]
 
     resources = ["*"]
@@ -121,6 +121,50 @@ data "aws_iam_policy_document" "s3" {
     resources = [
       "${aws_s3_bucket.default.arn}",
       "${aws_s3_bucket.default.arn}/*",
+    ]
+
+    effect = "Allow"
+  }
+}
+
+data "aws_codecommit_repository" "default" {
+  repository_name = "${var.repo_name}"
+}
+
+resource "aws_iam_role_policy_attachment" "codecommit" {
+  count      = "${var.enabled == "true" ? 1 : 0}"
+  role       = "${aws_iam_role.default.id}"
+  policy_arn = "${aws_iam_policy.codecommit.arn}"
+}
+
+module "codepipeline_codecommit_policy_label" {
+  source     = "github.com/cloudposse/terraform-terraform-label.git?ref=0.1.2"
+  attributes = ["${compact(concat(var.attributes, list("codepipeline", "codecommit")))}"]
+  delimiter  = "${var.delimiter}"
+  name       = "${var.name}"
+  namespace  = "${var.namespace}"
+  stage      = "${var.stage}"
+  tags       = "${var.tags}"
+}
+
+resource "aws_iam_policy" "codecommit" {
+  count  = "${var.enabled == "true" ? 1 : 0}"
+  name   = "${module.codepipeline_codecommit_policy_label.id}"
+  policy = "${data.aws_iam_policy_document.codecommit.json}"
+}
+
+data "aws_iam_policy_document" "codecommit" {
+  count = "${var.enabled == "true" ? 1 : 0}"
+
+  statement {
+    sid = ""
+
+    actions = [
+      "codecommit:*"
+    ]
+
+    resources = [
+      "${aws_codecommit_repository.default.arn}"
     ]
 
     effect = "Allow"
