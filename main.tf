@@ -205,17 +205,14 @@ resource "aws_codepipeline" "source_build_deploy" {
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
+      owner            = "AWS"
+      provider         = "AWS CodeCommit"
       version          = "1"
       output_artifacts = ["code"]
 
       configuration {
-        OAuthToken           = "${var.github_oauth_token}"
-        Owner                = "${var.repo_owner}"
-        Repo                 = "${var.repo_name}"
-        Branch               = "${var.branch}"
-        PollForSourceChanges = "${var.poll_source_changes}"
+        RepositoryName = "${var.repo_name}"
+        BranchName     = "${var.branch}"
       }
     }
   }
