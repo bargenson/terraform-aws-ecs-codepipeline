@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "codecommit" {
     ]
 
     resources = [
-      "${aws_codecommit_repository.default.arn}"
+      "${data.aws_codecommit_repository.default.arn}"
     ]
 
     effect = "Allow"
@@ -254,7 +254,7 @@ resource "aws_codepipeline" "source_build_deploy" {
       output_artifacts = ["code"]
 
       configuration {
-        RepositoryName = "${var.repo_name}"
+        RepositoryName = "${data.aws_codecommit_repository.default.repository_name}"
         BranchName     = "${var.branch}"
       }
     }
